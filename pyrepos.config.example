@@ -1,0 +1,3 @@
+# Pyrepos example config
+
+repos_dir=/path/to/my/repos     # this is a default path to look for repos in
