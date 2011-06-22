@@ -13,9 +13,11 @@ config = {
         'name': 'PyRepos',
         'entry_points':{
             'console_scripts': [
-                'repos = listrepos.repos:main',
+                'repos = pyrepos.repos:main',
             ]
         },
+        'test_suite': 'nose.collector',
+        'tests_require': ['nose'],
 }
 
 setup(**config)
