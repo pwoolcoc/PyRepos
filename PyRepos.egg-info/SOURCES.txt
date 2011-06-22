@@ -1,0 +1,11 @@
+setup.py
+PyRepos.egg-info/PKG-INFO
+PyRepos.egg-info/SOURCES.txt
+PyRepos.egg-info/dependency_links.txt
+PyRepos.egg-info/entry_points.txt
+PyRepos.egg-info/requires.txt
+PyRepos.egg-info/top_level.txt
+pyrepos/__init__.py
+pyrepos/repos.py
+tests/__init__.py
+tests/pyrepos_tests.py

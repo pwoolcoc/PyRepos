@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: PyRepos
+Version: 0.1
+Summary: Tool to list git/hg/bzr/svn repositories in filesystem
+Home-page: UNKNOWN
+Author: Paul Woolcock
+Author-email: pwoolcoc@umflint.edu
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN

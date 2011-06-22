@@ -41,9 +41,10 @@ def get_pairs(src):
                 _settings.update({key: value})
     return _settings
 
-def main(repos_dir=None):
+def main():
+    arguments = parse_args()
     settings = get_settings()
-    repos_dir = repos_dir or settings.get('repos_dir')
+    repos_dir = arguments.directory or settings.get('repos_dir')
     assert repos_dir is not None
     repos_dir = os.path.realpath(repos_dir)
     print_results(repos_dir)
@@ -68,13 +69,15 @@ def print_results(repos_dir):
 
     print()
 
-
-if __name__ == "__main__":
+def parse_args():
     parser = argparse.ArgumentParser(
             description="List available git/hg/bzr/svn repositories.")
     parser.add_argument(u"directory", nargs="?", default=None,
             help="Directory to search in. Defaults to repos_dir in ~/.pyrepos")
     args = parser.parse_args()
-    main(args.directory)
+    return args
+
+if __name__ == "__main__":
+    pass
 
 

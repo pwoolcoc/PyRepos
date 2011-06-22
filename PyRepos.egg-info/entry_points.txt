@@ -1,0 +1,3 @@
+[console_scripts]
+repos = pyrepos.repos:main
+
