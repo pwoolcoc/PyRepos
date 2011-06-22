@@ -52,8 +52,8 @@ def main():
 
 def print_results(repos_dir):
     print("\nRepository Directory: {repos_dir}\n".format(repos_dir=repos_dir))
-    print("{repos:<60} {bare}".format(repos="Repositories", bare="Bare?"))
-    print("{0:-^70}".format(""))
+    print("{repos:<59} {bare}".format(repos="Repositories", bare="Bare?"))
+    print("{0:-^66}".format(""))
 
     for path, dirs, files in os.walk(repos_dir):
         try:
