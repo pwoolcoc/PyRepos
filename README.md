@@ -21,7 +21,7 @@ me...).  The example config can be found in `pyrepos.config.example`,
 and the program looks for config files in the following files, in this
 order:
 
-    - /etc/pyrepos
-    - ~/.pyrepos
-    - ~/.config/pyrepos
+  - /etc/pyrepos
+  - ~/.pyrepos
+  - ~/.config/pyrepos
 
