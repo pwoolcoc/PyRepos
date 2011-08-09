@@ -19,6 +19,7 @@ BLUE = u"\033[1;34m"
 YES = u"{green}Yes{reset}".format(green=GREEN, reset=RESET)
 NO = u"{red}No{reset}".format(red=RED, reset=RESET)
 PATH = u"{blue}{heading}{reset}"
+DEFAULT_DIR = u"/"
 
 def get_settings(files=None):
     if files is None:
@@ -44,10 +45,13 @@ def get_pairs(src):
 def main():
     arguments = parse_args()
     settings = get_settings()
-    repos_dir = arguments.directory or settings.get('repos_dir')
-    assert repos_dir is not None
+    repos_dir = arguments.directory or settings.get('repos_dir') or DEFAULT_DIR
     repos_dir = os.path.realpath(repos_dir)
-    print_results(repos_dir)
+
+    if hasattr(arguments, 'dir') and arguments.dir:
+        print(repos_dir)
+    else:
+        print_results(repos_dir)
 
 
 def print_results(repos_dir):
@@ -74,6 +78,7 @@ def parse_args():
             description="List available git/hg/bzr/svn repositories.")
     parser.add_argument(u"directory", nargs="?", default=None,
             help="Directory to search in. Defaults to repos_dir in ~/.pyrepos")
+    parser.add_argument(u"--dir", action="store_true")
     args = parser.parse_args()
     return args
 
