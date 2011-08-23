@@ -8,7 +8,7 @@ config = {
         'author': 'Paul Woolcock',
         'author_email': 'pwoolcoc@umflint.edu',
         'version': '0.1',
-        'install_requires': ['GitPython==0.3.1'],
+        'install_requires': ['GitPython>=0.3.1'],
         'packages': find_packages(),
         'name': 'PyRepos',
         'entry_points':{
