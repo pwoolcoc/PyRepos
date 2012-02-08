@@ -2,7 +2,13 @@
 
 from __future__ import print_function
 
-import argparse
+try:
+    import argparse
+    _argparse = True
+except ImportError:
+    import optparse
+    _argparse = False
+
 import os
 import shlex
 
@@ -11,17 +17,12 @@ from git.repo.fun import is_git_dir
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
 
 
-RESET = u"\033[0m"
-RED = u"\033[1;31m"
-GREEN = u"\033[1;32m"
-BLUE = u"\033[1;34m"
-
-YES = u"{green}Yes{reset}".format(green=GREEN, reset=RESET)
-NO = u"{red}No{reset}".format(red=RED, reset=RESET)
-PATH = u"{blue}{heading}{reset}"
+YES = u"Yes"
+NO = u"No"
+PATH = u"{heading}"
 DEFAULT_DIR = u"/"
 
-def get_settings(files=None):
+def get_settings(cmd_line_opts, files=None):
     if files is None:
         user_dir = os.path.expanduser("~")
         files = ['/etc/pyrepos',
@@ -30,6 +31,10 @@ def get_settings(files=None):
     settings = {}
     for file_ in files:
         settings.update(**get_pairs(file_))
+    for opt in cmd_line_opts:
+        val = cmd_line_opts.get(opt)
+        if val is not None:
+            settings.update({opt: cmd_line_opts.get(opt)})
     return settings
 
 def get_pairs(src):
@@ -44,43 +49,64 @@ def get_pairs(src):
 
 def main():
     arguments = parse_args()
-    settings = get_settings()
-    repos_dir = arguments.directory or settings.get('repos_dir') or DEFAULT_DIR
+    settings = get_settings(arguments)
+    repos_dir = settings.get('repos_dir', DEFAULT_DIR)
     repos_dir = os.path.realpath(repos_dir)
 
-    if hasattr(arguments, 'dir') and arguments.dir:
+    if arguments.get('dir', False):
         print(repos_dir)
     else:
-        print_results(repos_dir)
+        print_results(repos_dir, settings)
 
 
-def print_results(repos_dir):
-    print("\nRepository Directory: {repos_dir}\n".format(repos_dir=repos_dir))
-    print("{repos:<59} {bare}".format(repos="Repositories", bare="Bare?"))
-    print("{0:-^66}".format(""))
 
+def get_results(repos_dir):
+    paths = []
     for path, dirs, files in os.walk(repos_dir):
-        try:
+        if is_git_dir(path):
             repo = Repo(path)
-            if is_git_dir(path):
-                path = PATH.format(blue=BLUE,
-                                   heading=os.path.relpath(path, repos_dir),
-                                   reset=RESET)
-                bare = YES if repo.bare else NO
-                print("{path:_<70} {bare}".format(path=path, bare=bare))
-        except (InvalidGitRepositoryError, NoSuchPathError):
-            pass
+            path = PATH.format(heading=os.path.relpath(path, repos_dir))
+            bare = YES if repo.bare else NO
+            dirty = YES if repo.is_dirty() else NO
+            paths.append({'path': path, 'bare': bare, 'dirty': dirty})
+    return paths
+
+
+def print_results(repos_dir, settings):
+    results = get_results(repos_dir)
+    lens = [len(entry['path']) for entry in results]
+    max_len = max(lens + [12])
+
+
+    if not settings.get('silent', False):
+        print("\nBase Directory: {repos_dir}\n".format(repos_dir=repos_dir))
+        print("{repos:<{width}}\t{bare:<8}\t{dirty}".format(repos="REPOSITORIES",
+                bare="BARE", dirty="DIRTY", width=max_len))
+
+    for entry in results:
+        print("{path:<{width}}\t{bare:<8}\t{dirty}".format(path=entry['path'],
+                                                           bare=entry['bare'],
+                                                           dirty=entry['dirty'],
+                                                           width=max_len))
 
     print()
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-            description="List available git/hg/bzr/svn repositories.")
-    parser.add_argument(u"directory", nargs="?", default=None,
-            help="Directory to search in. Defaults to repos_dir in ~/.pyrepos")
-    parser.add_argument(u"--dir", action="store_true")
-    args = parser.parse_args()
-    return args
+    if _argparse:
+        parser = argparse.ArgumentParser(
+                description="List available git/hg/bzr/svn repositories.")
+        parser.add_argument(u"repos_dir", nargs="?", default=None,
+                help="Directory to search in. Defaults to repos_dir in ~/.pyrepos")
+        parser.add_argument(u"--dir", action="store_true")
+        parser.add_argument(u'--silent', action="store_true")
+        args = parser.parse_args()
+    else:
+        parser = optparse.OptionParser()
+        parser.add_option(u'repos_dir', default=None)
+        parser.add_option(u'--dir', action=u'store_true')
+        parser.add_option(u'--silent', action=u'store_true')
+        options, args = parser.parse_args()
+    return vars(args)
 
 if __name__ == "__main__":
     pass
