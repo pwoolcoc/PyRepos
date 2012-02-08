@@ -1,3 +1,6 @@
 # Pyrepos example config
 
 repos_dir=/path/to/my/repos     # this is a default path to look for repos in
+full_path=true                  # always show full paths instead of relative ones
+silent=false                    # show headings
+dirty=false                     # show clean & dirty repos
